@@ -1,0 +1,96 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { Delete, Edit } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+
+import { useContext } from "react";
+import { InstructorContext } from "@/context/instructor-context/Index";
+
+
+
+
+function InstructorCourses({ listOfCourses }){
+  const navigate = useNavigate();
+  const {CurrentEditedCourseId,setCurrentEditedCourseId} = useContext(InstructorContext)
+ 
+
+  return (
+        <Card>
+          <CardHeader className="flex justify-between flex-row items-center ">
+            <CardTitle className="text-3xl font-extrabold text-teal-600">All Courses</CardTitle>
+
+      <Button  className="p-6 bg-teal-600 text-white font-bold"
+       onClick={() => {
+        setCurrentEditedCourseId(null)
+        navigate("/instructor/add-new-course")
+      } }
+      
+      >
+        Create New Course
+      </Button>
+          </CardHeader>
+
+          <CardContent>
+
+   <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Courses</TableHead>
+            <TableHead>No.Students</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {
+            listOfCourses && listOfCourses.length > 0 ?
+            listOfCourses.map(course=>
+              <TableRow>
+                <TableCell className='font-medium'>
+                  {course?.title}
+                </TableCell>
+                <TableCell>{course?.students?.length}</TableCell>
+                <TableCell>${course?.pricing}</TableCell>
+                <TableCell className='text-right'>
+
+                  <Button onClick={()=>{
+                    setCurrentEditedCourseId(course?._id);
+                    navigate(`/instructor/edit-course/${course?._id}`)
+
+                  }}
+                  variant="ghost" size="sm">
+                    <Edit className="h-6 w-6"/>
+                  </Button>
+
+                  <Button variant="ghost" size="sm">
+                    <Delete className="h-6 w-6"/>
+                  </Button>
+
+                </TableCell>
+
+              </TableRow>
+            ) :null
+          }
+          
+        </TableBody>
+        
+      </Table>
+    </div>
+    </CardContent>
+        </Card>
+    ) ;
+
+    
+}
+
+export default InstructorCourses
