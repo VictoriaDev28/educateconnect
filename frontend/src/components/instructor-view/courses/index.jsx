@@ -13,13 +13,16 @@ import {
 
 import { useContext } from "react";
 import { InstructorContext } from "@/context/instructor-context/Index";
+import { courseLandingInitialFormData, courseCurriculumInitialFormData } from "@/config/form";
+
+
 
 
 
 
 function InstructorCourses({ listOfCourses }){
   const navigate = useNavigate();
-  const {CurrentEditedCourseId,setCurrentEditedCourseId} = useContext(InstructorContext)
+  const { setCurrentEditedCourseId, setCourseLandingFormData, setCourseCurriculumFormData } = useContext(InstructorContext)
  
 
   return (
@@ -27,12 +30,14 @@ function InstructorCourses({ listOfCourses }){
           <CardHeader className="flex justify-between flex-row items-center ">
             <CardTitle className="text-3xl font-extrabold text-teal-600">All Courses</CardTitle>
 
-      <Button  className="p-6 bg-teal-600 text-white font-bold"
+      <Button  
        onClick={() => {
-        setCurrentEditedCourseId(null)
-        navigate("/instructor/add-new-course")
+        setCurrentEditedCourseId(null);
+        setCourseLandingFormData(courseLandingInitialFormData);
+        setCourseCurriculumFormData(courseCurriculumInitialFormData)
+        navigate("/instructor/create-new-course");
       } }
-      
+      className="p-6 bg-teal-600 text-white font-bold"
       >
         Create New Course
       </Button>

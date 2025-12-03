@@ -24,7 +24,7 @@ export async function mediaUploadService(formData, onProgressCallback) {
     const { data } = await axiosInstance.post('/media/upload', formData, {
         onUploadProgress : (progressEvent => {
             const percentCompleted = Math.round((progressEvent.loaded * 100)/progressEvent.total)
-            onProgressCallback(percentCompleted)
+        onProgressCallback(percentCompleted)
         })
     });
 
@@ -54,6 +54,29 @@ export async function updateCourseByIdService(id, formData){
     return data;
 }
 
+
+export async function mediaBulkUploadService(formData, onProgressCallback) {
+    const { data } = await axiosInstance.post('/media/bulk-upload', formData, {
+        onUploadProgress : (progressEvent => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100)/progressEvent.total)
+        onProgressCallback(percentCompleted)
+        })
+    });
+
+    return data;
+}
+
+// student service
+export async function fetchStudentViewCourseListService(query){
+    const { data } = await axiosInstance.get(`/student/course/get?${query}`)
+    return data;
+}
+
+
+export async function fetchStudentViewCourseDetailsService(courseId){
+    const { data } = await axiosInstance.get(`/student/course/get/details${courseId}`)
+    return data;
+}
 
 
 export default registerService;

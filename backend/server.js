@@ -5,6 +5,7 @@ const connectdb = require('./config/db');
 const authRoutes = require('./routes/auth-routes/auth');
 const mediaRoutes = require('./routes/instructor-routes/mediaRoutes');
 const instructorCourseRoutes = require('./routes/instructor-routes/courseRoute');
+const studentViewCourseRoutes = require('./routes/student-routes/courseRoute')
 
 
 connectdb();
@@ -24,6 +25,8 @@ app.use(cors({
 app.use("/auth" , authRoutes)
 app.use("/media", mediaRoutes)
 app.use("/instructor/course", instructorCourseRoutes)
+app.use("/student/course", studentViewCourseRoutes)
+
 
 app.use((err, req, res, next) => {
     console.log(err.stack)

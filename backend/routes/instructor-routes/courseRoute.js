@@ -8,4 +8,4 @@ router.get('/get', getAllCourses);
 router.get('/get/details/:id', getCourseDetailsByID);
 router.put('/update/:id', updateCourseByID);
 
-module.exports = router
+module.exports = router;

@@ -9,6 +9,7 @@ import AddNewCoursePage from "./pages/instructor/AddNewCourse";
 import StudentViewCommonLayout from "./components/student-view/CommonLayout";
 import StudentHomePage from "./pages/student/home/Index";
 import NotFoundPage from "./pages/not-found/Index";
+import StudentViewCoursesPage from "./pages/student/courses/Index";
 
 function App() {
 
@@ -58,6 +59,7 @@ function App() {
 
       <Route path="" element={<StudentHomePage />}/>
       <Route path="home" element={<StudentHomePage />}/>
+      <Route path="courses" element={<StudentViewCoursesPage />}/>
 
     </Route>
     <Route path="*" element={<NotFoundPage />}/>

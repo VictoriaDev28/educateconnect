@@ -1,3 +1,4 @@
+import React from "react"
 import CourseCurriculum from "@/components/instructor-view/courses/add-new-course/CourseCurriculum"
 import CourseLanding from "@/components/instructor-view/courses/add-new-course/CourseLandingPage"
 import CourseSettings  from "@/components/instructor-view/courses/add-new-course/CourseSettings"
@@ -10,6 +11,7 @@ import { AuthContext } from "@/context/auth-context/Index"
 import { addNewCourseService, fetchInstructorCourseDetailsService } from "@/services/index"
 import { courseCurriculumInitialFormData, courseLandingInitialFormData } from "@/config/form"
 import { useNavigate, useParams } from "react-router-dom"
+
 
 
 
@@ -68,38 +70,45 @@ function AddNewCoursePage(){
     curriculum: courseCurriculumFormData,
     isPublished:  true
   };
-  const response =  await addNewCourseService(courseFinalFormData)
+  const response =  
+  currentEditedCourseId !== null ? await updateCourseByIdService(currentEditedCourseId, courseFinalFormData)
+  :
+  await addNewCourseService(courseFinalFormData)
 
   if(response?.success){
     setCourseLandingFormData(courseLandingInitialFormData)
     setCourseCurriculumFormData(courseCurriculumInitialFormData)
     navigate(-1);
+    // setCurrentEditedCourseId(null)
 
   }
     }
 
     async function fetchCurrentCourseDetails(){
         const response = await fetchInstructorCourseDetailsService(currentEditedCourseId)
-    };
-    if(response?.success){
-        const setCourseFormData = object.keys(courseLandingInitialFormData).reduce((acc, key)=>{
+        if(response?.success){
+        const setCourseFormData = Object.keys(courseLandingInitialFormData).reduce((acc, key)=>{
             acc[key] = response?.data[key] || courseLandingInitialFormData[key]
 
-            return ac
+            return acc
         },{});
 
         setCourseLandingFormData(setCourseFormData)
         setCourseCurriculumFormData(response?.data?.curriculum)
+
+    };
+    
+        
     }
 
     useEffect(()=>{
         if(currentEditedCourseId !== null) fetchCurrentCourseDetails()
-    },[currentEditedCourseId])
+    },[currentEditedCourseId, fetchInstructorCourseDetailsService])
 
     useEffect(()=>{
-        if(params)setCurrentEditedCourseId(params?.courseId)
+        if(params?.courseId) setCurrentEditedCourseId(params?.courseId)
 
-    },[params])
+    },[params?.courseId]);
 
 
         

@@ -164,3 +164,15 @@ export const courseCurriculumInitialFormData = [
         public_id: "",
     },
 ]
+
+export const sortOptions = [
+    {id:"title-atoz", label:"Title: A to Z"},
+    {id:"title-ztoa", label:"Title: Z to A"},
+];
+
+
+export const filterOptions = {
+    category: courseCategories,
+    level: courseLevelOptions,
+    primaryLangauge: languageOptions,
+};

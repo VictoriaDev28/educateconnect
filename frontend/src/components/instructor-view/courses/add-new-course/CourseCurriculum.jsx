@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { useContext } from "react"
 import { courseCurriculumInitialFormData } from "@/config/form"
-import { mediaUploadService } from "@/services"
+import { mediaBulkUploadService, mediaUploadService } from "@/services"
 import { Button } from "@/components/ui/button"
 import MediaProgressBar from "@/components/media-progress-bar/Index"
 
@@ -16,6 +16,10 @@ function CourseCurriculum(){
         mediaUploadProgress, setMediaUploadProgress,
         mediaUploadProgressPercentage, setMediaUploadProgressPercentage}
          = useContext(InstructorContext);
+
+
+const bulkUploadInputRef = useRef(null)     
+
 
     function handleNewCourse(){
         setCourseCurriculumFormData([
@@ -73,14 +77,108 @@ async function handleSingleCourseUpload(event, currentIndex){
     }
 }
 
+
+function handleOpenBulkUploadDialog(){
+    bulkUploadInputRef.current?.click();
+}
+
+
+function areAllCourseCurriculumFormDataObjectsEmpty(arr){
+    return arr.every((obj)=>{
+        return Object.entries(obj).every(([Key, value])=>{
+            if(typeof value === 'boolean'){
+                return true
+            }
+            return value === ''
+        })
+    })
+}
+
+
+async function handleMediaBulkUpload(event){
+    const selectedFiles = Array.from(event.target.files);
+    const bulkFormData = new FormData()
+
+    selectedFiles.forEach(fileItem=> bulkFormData.append('file', fileItem))
+    try {
+        setMediaUploadProgress(true);
+        const response = await mediaBulkUploadService(bulkFormData, setMediaUploadProgressPercentage)
+
+        console.log(response, "bulk");
+        if(response?.success){
+            let cpyCourseCurriculumFormData = 
+            areAllCourseCurriculumFormDataObjectsEmpty(courseCurriculumFormData)
+            ?[] 
+            : [...courseCurriculumFormData]
+
+            cpyCourseCurriculumFormData = [
+                ...cpyCourseCurriculumFormData,
+                ...response?.data.map((item,index)=> ({
+                    videoUrl: item?.url,
+                    public_id: item?.public_id,
+                    title: `Lecture ${cpyCourseCurriculumFormData.length + (index + 1)}`,
+                    free: false 
+                }))
+            ]
+            setCourseCurriculumFormData(cpyCourseCurriculumFormData)
+            setMediaUploadProgress(false)
+        }
+        
+    } catch (error) {
+        console.log(error)
+        
+    }
+}
+
+
+async function handleDeleteCourse(currentIndex){
+    let cpyCourseCurriculumFormData = [...courseCurriculumFormData];
+
+    const getCurrentSelectedVideoPublicId = cpyCourseCurriculumFormData[currentIndex].public_id;
+
+    const response = await mediaDeleteService(getCurrentSelectedVideoPublicId);
+
+    if(response?.success){
+        cpyCourseCurriculumFormData = cpyCourseCurriculumFormData.filter((_,index)=> index !== currentIndex);
+
+        setCourseCurriculumFormData(cpyCourseCurriculumFormData);
+    }
+}
     return(
         <Card>
-            <CardHeader>
+            <CardHeader className={'flex flex-row justify-between'}>
                 <CardTitle className=" text-teal-600">Create Course Curriculum</CardTitle>
+                <div>
+                    <Input
+                    type="file"
+                    ref={bulkUploadInputRef}
+                    accept="video/*"
+                    multiple
+                    className={'hidden'}
+                    id="bulk-media-upload"
+                    onChange={handleMediaBulkUpload}
+                    />
+
+                    <Button 
+                    as="label"
+                    htmlFor="bulk-media-upload"
+                    variant="outline"
+                    className={'cursor-pointer'}
+                    onClick={handleOpenBulkUploadDialog}
+                    >
+                        <Upload className="w-4 h-5 mr-2"/>
+                        Bulk Upload
+                    </Button>
+                </div>
+
+
             </CardHeader>
             <CardContent>
 
-                <Button onClick={handleNewCourse} className="bg-teal-600 text-white">Add Course</Button>
+                <Button disabled={!isCourseCurriculumFormDataValid() || mediaUpload}
+                onClick={handleNewCourse} className="bg-teal-600 text-white">
+                    Add Course
+                </Button>
                 {
                     mediaUploadProgress ? 
                     <MediaProgressBar  
@@ -131,8 +229,12 @@ async function handleSingleCourseUpload(event, currentIndex){
                                             controls
                                             className="rounded-md"
                                             />
-                                            <Button>Replace Video</Button>
-                                            <Button className="bg-red-600">Delete Video</Button>
+                                            <Button onClick={()=>handleReplaceVideo(index)}>
+                                                Replace Video
+                                                </Button>
+                                            <Button onClick={()=> handleDeleteCourse(index)} className="bg-red-600">
+                                                Delete Video
+                                            </Button>
                                         </div>
                                         )
                                         :
